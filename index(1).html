@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Café Latté — Find Your Corner. Sip Your Story.</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500&family=Bebas+Neue&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --cream: #F5ECD7;
+  --warm-brown: #5C3A1E;
+  --espresso: #2C1A0E;
+  --latte: #C8955E;
+  --gold: #D4A853;
+  --soft-white: #FAF6EF;
+  --neon-amber: #FFB347;
+  --text-dark: #1A0F07;
+  --glass: rgba(245,236,215,0.08);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:#0D0803;
+  color:var(--cream);
+  font-family:'DM Sans',sans-serif;
+  overflow-x:hidden;
+  cursor:none;
+}
+
+/* CUSTOM CURSOR */
+.cursor{
+  position:fixed;width:12px;height:12px;background:var(--neon-amber);
+  border-radius:50%;pointer-events:none;z-index:9999;
+  transform:translate(-50%,-50%);transition:transform .1s;mix-blend-mode:difference;
+}
+.cursor-trail{
+  position:fixed;width:32px;height:32px;border:1.5px solid var(--latte);
+  border-radius:50%;pointer-events:none;z-index:9998;
+  transform:translate(-50%,-50%);transition:all .18s ease;opacity:.6;
+}
+
+/* LOADING SCREEN */
+#loader{
+  position:fixed;inset:0;background:#0D0803;z-index:10000;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transition:opacity .8s ease;
+}
+.brew-text{
+  font-family:'Playfair Display',serif;font-size:clamp(1.2rem,3vw,2rem);
+  color:var(--latte);letter-spacing:.2em;margin-bottom:2rem;
+  animation:pulse 1.5s infinite;
+}
+.brew-bar{
+  width:200px;height:2px;background:rgba(200,149,94,.2);position:relative;overflow:hidden;
+}
+.brew-bar::after{
+  content:'';position:absolute;left:-100%;top:0;height:100%;
+  width:100%;background:linear-gradient(90deg,transparent,var(--latte),var(--gold));
+  animation:brew 1.8s ease infinite;
+}
+@keyframes brew{to{left:100%;}}
+@keyframes pulse{0%,100%{opacity:.6;}50%{opacity:1;}}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  padding:1.2rem 4rem;display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(180deg,rgba(13,8,3,.9) 0%,transparent 100%);
+  backdrop-filter:blur(2px);
+  transition:all .3s;
+}
+nav.scrolled{background:rgba(13,8,3,.95);backdrop-filter:blur(12px);}
+.nav-logo{
+  font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:900;
+  color:var(--cream);letter-spacing:.05em;
+}
+.nav-logo span{color:var(--latte);}
+.nav-links{display:flex;gap:2.5rem;list-style:none;}
+.nav-links a{
+  color:rgba(245,236,215,.7);text-decoration:none;font-size:.85rem;
+  letter-spacing:.12em;text-transform:uppercase;font-weight:500;
+  transition:color .3s;position:relative;
+}
+.nav-links a::after{
+  content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;
+  background:var(--latte);transition:width .3s;
+}
+.nav-links a:hover{color:var(--cream);}
+.nav-links a:hover::after{width:100%;}
+.nav-cta{
+  background:var(--latte);color:var(--espresso);padding:.6rem 1.5rem;
+  border-radius:50px;font-size:.82rem;font-weight:500;letter-spacing:.08em;
+  text-transform:uppercase;cursor:pointer;border:none;transition:all .3s;
+}
+.nav-cta:hover{background:var(--gold);transform:scale(1.04);}
+
+/* HERO */
+#hero{
+  height:100vh;position:relative;display:flex;align-items:center;
+  overflow:hidden;
+}
+.hero-canvas{
+  position:absolute;inset:0;z-index:0;
+}
+.hero-bg{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse at 30% 50%,rgba(200,149,94,.15) 0%,transparent 60%),
+             radial-gradient(ellipse at 80% 20%,rgba(212,168,83,.1) 0%,transparent 50%),
+             linear-gradient(135deg,#0D0803 0%,#1A0F07 50%,#0D0803 100%);
+}
+/* 3D Coffee particles canvas */
+#particles-canvas{position:absolute;inset:0;z-index:1;}
+
+.hero-content{
+  position:relative;z-index:5;padding:0 4rem;max-width:900px;
+}
+.hero-eyebrow{
+  font-size:.75rem;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--latte);margin-bottom:1.5rem;
+  display:flex;align-items:center;gap:1rem;
+  animation:fadeUp .8s ease .3s both;
+}
+.hero-eyebrow::before{content:'';width:40px;height:1px;background:var(--latte);}
+.hero-title{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(3.5rem,9vw,8rem);
+  line-height:.95;font-weight:900;
+  animation:fadeUp .8s ease .5s both;
+}
+.hero-title .accent{color:var(--latte);font-style:italic;}
+.hero-tagline{
+  font-size:clamp(1rem,2vw,1.3rem);color:rgba(245,236,215,.65);
+  margin:1.8rem 0 2.5rem;font-weight:300;letter-spacing:.05em;line-height:1.6;
+  animation:fadeUp .8s ease .7s both;
+}
+.hero-actions{
+  display:flex;gap:1rem;flex-wrap:wrap;
+  animation:fadeUp .8s ease .9s both;
+}
+.btn-primary{
+  background:linear-gradient(135deg,var(--latte),var(--gold));
+  color:var(--espresso);padding:.9rem 2.2rem;border-radius:50px;
+  font-weight:600;letter-spacing:.1em;text-transform:uppercase;font-size:.82rem;
+  cursor:pointer;border:none;transition:all .4s;
+  box-shadow:0 8px 32px rgba(200,149,94,.3);
+}
+.btn-primary:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 16px 48px rgba(200,149,94,.5);}
+.btn-outline{
+  background:transparent;color:var(--cream);
+  padding:.9rem 2.2rem;border-radius:50px;
+  border:1.5px solid rgba(245,236,215,.3);
+  font-weight:500;letter-spacing:.1em;text-transform:uppercase;font-size:.82rem;
+  cursor:pointer;transition:all .4s;
+}
+.btn-outline:hover{border-color:var(--latte);color:var(--latte);transform:translateY(-2px);}
+
+.vibe-badge{
+  position:absolute;right:4rem;bottom:30%;z-index:5;
+  background:rgba(245,236,215,.06);backdrop-filter:blur(12px);
+  border:1px solid rgba(245,236,215,.12);border-radius:16px;
+  padding:1.2rem 1.5rem;animation:float 4s ease-in-out infinite;
+}
+.vibe-dot{
+  display:inline-block;width:8px;height:8px;background:#4CAF50;
+  border-radius:50%;margin-right:.5rem;animation:blink 2s infinite;
+}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+.vibe-label{font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--latte);}
+.vibe-status{font-size:1.1rem;font-weight:600;margin-top:.3rem;}
+.vibe-wait{font-size:.75rem;color:rgba(245,236,215,.5);margin-top:.2rem;}
+
+.hero-scroll{
+  position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:.5rem;
+  animation:fadeUp .8s ease 1.2s both;
+}
+.scroll-line{width:1px;height:60px;background:linear-gradient(to bottom,var(--latte),transparent);animation:scrollPulse 2s infinite;}
+@keyframes scrollPulse{0%{opacity:1;transform:scaleY(1);}100%{opacity:0;transform:scaleY(0);transform-origin:top;}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+
+/* SECTION STYLES */
+section{padding:7rem 4rem;}
+.section-eyebrow{
+  font-size:.7rem;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--latte);margin-bottom:1rem;
+  display:flex;align-items:center;gap:1rem;
+}
+.section-eyebrow::before{content:'';width:30px;height:1px;background:var(--latte);}
+.section-title{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2.5rem,5vw,4.5rem);
+  font-weight:900;line-height:1.05;margin-bottom:1.5rem;
+}
+
+/* MAP SECTION */
+#map-section{
+  background:linear-gradient(180deg,#0D0803 0%,#110a04 50%,#0D0803 100%);
+  position:relative;overflow:hidden;
+}
+.cafe-map{
+  position:relative;width:100%;max-width:900px;margin:3rem auto 0;
+  aspect-ratio:16/9;border-radius:20px;overflow:hidden;
+  border:1px solid rgba(200,149,94,.2);
+  box-shadow:0 40px 100px rgba(0,0,0,.6),0 0 0 1px rgba(200,149,94,.1);
+}
+.map-floor{
+  width:100%;height:100%;background:linear-gradient(135deg,#1a0f07 0%,#2c1a0e 100%);
+  position:relative;
+}
+/* floor grid */
+.map-floor::before{
+  content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(200,149,94,.06) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(200,149,94,.06) 1px,transparent 1px);
+  background-size:40px 40px;
+}
+.map-zone{
+  position:absolute;cursor:pointer;transition:all .4s;
+  border-radius:12px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  border:1.5px solid rgba(200,149,94,.15);
+  background:rgba(200,149,94,.05);
+}
+.map-zone:hover{
+  background:rgba(200,149,94,.15);
+  border-color:var(--latte);
+  transform:scale(1.04);
+  z-index:10;
+  box-shadow:0 0 30px rgba(200,149,94,.3);
+}
+.map-zone .zone-icon{font-size:2rem;margin-bottom:.4rem;}
+.map-zone .zone-name{font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--latte);}
+.zone-coffee{top:10%;left:5%;width:22%;height:30%;}
+.zone-mural{top:5%;left:30%;width:40%;height:22%;}
+.zone-dining{top:32%;left:30%;width:45%;height:40%;}
+.zone-chill{top:10%;right:3%;width:20%;height:35%;}
+.zone-bar{bottom:10%;left:5%;width:22%;height:25%;}
+
+.zone-popup{
+  position:absolute;background:rgba(13,8,3,.95);
+  border:1px solid rgba(200,149,94,.3);
+  border-radius:12px;padding:1.2rem;z-index:20;
+  min-width:180px;pointer-events:none;
+  backdrop-filter:blur(12px);
+  opacity:0;transition:opacity .3s;
+  font-size:.8rem;
+}
+.zone-popup.visible{opacity:1;}
+
+/* MENU SECTION */
+#menu-section{background:#0D0803;}
+.menu-tabs{
+  display:flex;gap:1rem;margin:2.5rem 0;flex-wrap:wrap;
+}
+.menu-tab{
+  padding:.6rem 1.5rem;border-radius:50px;cursor:pointer;
+  font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;font-weight:500;
+  border:1.5px solid rgba(245,236,215,.15);color:rgba(245,236,215,.5);
+  background:transparent;transition:all .3s;
+}
+.menu-tab.active{
+  background:var(--latte);color:var(--espresso);border-color:var(--latte);
+}
+.menu-tab:hover:not(.active){border-color:var(--latte);color:var(--latte);}
+
+.menu-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:1.5rem;
+}
+.menu-card{
+  background:rgba(245,236,215,.03);
+  border:1px solid rgba(245,236,215,.08);
+  border-radius:16px;padding:1.5rem;
+  transition:all .4s;position:relative;overflow:hidden;
+  cursor:pointer;
+}
+.menu-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(200,149,94,.08),transparent);
+  opacity:0;transition:opacity .4s;
+}
+.menu-card:hover{
+  border-color:rgba(200,149,94,.3);
+  transform:translateY(-4px);
+  box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+.menu-card:hover::before{opacity:1;}
+.menu-card-emoji{font-size:1.8rem;margin-bottom:.8rem;}
+.menu-card-name{
+  font-family:'Playfair Display',serif;font-size:1.05rem;
+  font-weight:700;margin-bottom:.4rem;color:var(--cream);
+}
+.menu-card-desc{
+  font-size:.78rem;color:rgba(245,236,215,.45);line-height:1.5;margin-bottom:1rem;
+}
+.menu-card-footer{display:flex;align-items:center;justify-content:space-between;}
+.menu-price{
+  font-family:'Bebas Neue',sans-serif;font-size:1.4rem;
+  color:var(--latte);letter-spacing:.05em;
+}
+.menu-tag{
+  font-size:.65rem;padding:.25rem .6rem;border-radius:20px;
+  background:rgba(255,179,71,.1);color:var(--neon-amber);
+  letter-spacing:.1em;text-transform:uppercase;
+}
+.menu-section-hidden{display:none;}
+.menu-section-visible{display:contents;}
+
+/* GALLERY */
+#gallery{
+  background:linear-gradient(180deg,#0D0803,#110a04);
+  position:relative;
+}
+.gallery-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  grid-template-rows:repeat(2,250px);
+  gap:1rem;margin-top:3rem;
+}
+.gallery-item{
+  border-radius:12px;overflow:hidden;position:relative;cursor:pointer;
+  background:rgba(245,236,215,.04);border:1px solid rgba(245,236,215,.06);
+  transition:transform .4s;
+}
+.gallery-item:hover{transform:scale(1.02);z-index:2;}
+.gallery-item:first-child{grid-column:span 2;grid-row:span 2;}
+.gallery-item:nth-child(4){grid-column:span 2;}
+.gallery-emoji{
+  font-size:4rem;position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  filter:drop-shadow(0 4px 20px rgba(200,149,94,.5));
+  transition:transform .4s;
+}
+.gallery-item:hover .gallery-emoji{transform:translate(-50%,-55%) scale(1.1);}
+.gallery-overlay{
+  position:absolute;inset:0;background:linear-gradient(to top,rgba(13,8,3,.8),transparent);
+  opacity:0;transition:opacity .4s;
+  display:flex;align-items:flex-end;padding:1.2rem;
+}
+.gallery-item:hover .gallery-overlay{opacity:1;}
+.gallery-caption{font-size:.8rem;color:var(--cream);font-weight:500;}
+
+/* RESERVE */
+#reserve{
+  background:#0D0803;
+  display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:center;
+}
+.reserve-card{
+  background:rgba(245,236,215,.04);border:1px solid rgba(245,236,215,.1);
+  border-radius:24px;padding:2.5rem;
+}
+.form-group{margin-bottom:1.5rem;}
+.form-label{font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--latte);display:block;margin-bottom:.6rem;}
+.form-input{
+  width:100%;background:rgba(245,236,215,.05);
+  border:1px solid rgba(245,236,215,.12);border-radius:10px;
+  padding:.85rem 1rem;color:var(--cream);font-family:'DM Sans',sans-serif;
+  font-size:.9rem;outline:none;transition:border-color .3s;
+}
+.form-input:focus{border-color:var(--latte);}
+.form-input option{background:#1a0f07;}
+.time-slots{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.5rem;}
+.time-slot{
+  padding:.4rem .9rem;border-radius:20px;font-size:.75rem;
+  border:1px solid rgba(245,236,215,.15);cursor:pointer;
+  transition:all .3s;color:rgba(245,236,215,.5);
+}
+.time-slot:hover,.time-slot.active{background:var(--latte);color:var(--espresso);border-color:var(--latte);}
+
+.order-cards{display:flex;flex-direction:column;gap:1rem;}
+.order-card{
+  display:flex;align-items:center;gap:1.2rem;
+  background:rgba(245,236,215,.04);border:1px solid rgba(245,236,215,.08);
+  border-radius:14px;padding:1.2rem 1.5rem;
+  cursor:pointer;transition:all .3s;text-decoration:none;color:var(--cream);
+}
+.order-card:hover{border-color:var(--latte);background:rgba(200,149,94,.08);transform:translateX(4px);}
+.order-icon{font-size:2rem;}
+.order-name{font-weight:600;margin-bottom:.2rem;}
+.order-sub{font-size:.75rem;color:rgba(245,236,215,.4);}
+.order-arrow{margin-left:auto;color:var(--latte);font-size:1.2rem;}
+
+/* REVIEWS */
+#reviews{background:linear-gradient(180deg,#0D0803,#110a04 50%,#0D0803);}
+.rating-hero{
+  display:flex;align-items:baseline;gap:1rem;margin:2rem 0;
+}
+.rating-number{
+  font-family:'Bebas Neue',sans-serif;font-size:6rem;
+  color:var(--gold);line-height:1;
+}
+.rating-stars{color:var(--gold);font-size:1.4rem;letter-spacing:.1em;}
+.rating-count{color:rgba(245,236,215,.4);font-size:.85rem;}
+.reviews-scroll{
+  display:flex;gap:1.5rem;overflow-x:auto;padding:1.5rem 0;
+  scrollbar-width:none;
+}
+.reviews-scroll::-webkit-scrollbar{display:none;}
+.review-card{
+  min-width:300px;background:rgba(245,236,215,.04);
+  border:1px solid rgba(245,236,215,.08);border-radius:16px;
+  padding:1.5rem;flex-shrink:0;transition:all .4s;
+}
+.review-card:hover{border-color:rgba(200,149,94,.3);transform:translateY(-4px);}
+.review-stars{color:var(--gold);margin-bottom:1rem;font-size:.9rem;}
+.review-text{
+  font-family:'Playfair Display',serif;font-style:italic;
+  font-size:1rem;line-height:1.6;color:rgba(245,236,215,.8);margin-bottom:1.2rem;
+}
+.review-author{font-size:.75rem;color:var(--latte);letter-spacing:.1em;text-transform:uppercase;}
+
+/* INFO */
+#info{
+  background:#0D0803;
+  display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start;
+}
+.info-block{margin-bottom:2rem;}
+.info-icon{font-size:1.5rem;margin-bottom:.8rem;}
+.info-label{font-size:.68rem;letter-spacing:.25em;text-transform:uppercase;color:var(--latte);margin-bottom:.4rem;}
+.info-value{font-size:1.1rem;font-weight:500;}
+.info-sub{font-size:.82rem;color:rgba(245,236,215,.45);margin-top:.2rem;}
+.directions-btn{
+  display:inline-flex;align-items:center;gap:.6rem;
+  background:linear-gradient(135deg,var(--latte),var(--gold));
+  color:var(--espresso);padding:.8rem 2rem;border-radius:50px;
+  font-weight:600;font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;
+  cursor:pointer;border:none;transition:all .4s;margin-top:1.5rem;
+  text-decoration:none;
+}
+.directions-btn:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(200,149,94,.4);}
+
+.hours-graph{margin-top:2rem;}
+.hours-bar-row{
+  display:flex;align-items:center;gap:.8rem;margin-bottom:.5rem;
+}
+.hours-day{font-size:.7rem;width:30px;color:rgba(245,236,215,.5);text-transform:uppercase;}
+.hours-bar{
+  height:8px;border-radius:4px;background:rgba(200,149,94,.15);flex:1;
+  position:relative;overflow:hidden;
+}
+.hours-fill{
+  height:100%;border-radius:4px;
+  background:linear-gradient(90deg,var(--latte),var(--gold));
+  transition:width 1s ease;
+}
+
+/* FOOTER */
+footer{
+  background:#080402;
+  padding:4rem;
+  border-top:1px solid rgba(245,236,215,.06);
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:2rem;
+}
+.footer-logo{
+  font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;
+}
+.footer-logo span{color:var(--latte);}
+.footer-tagline{font-size:.75rem;color:rgba(245,236,215,.35);letter-spacing:.15em;text-transform:uppercase;margin-top:.3rem;}
+.footer-links{display:flex;gap:2rem;list-style:none;}
+.footer-links a{
+  color:rgba(245,236,215,.4);font-size:.8rem;text-decoration:none;
+  transition:color .3s;letter-spacing:.08em;text-transform:uppercase;
+}
+.footer-links a:hover{color:var(--latte);}
+.footer-hashtag{
+  font-family:'Playfair Display',serif;font-style:italic;
+  color:var(--latte);font-size:1rem;
+}
+.footer-copy{
+  width:100%;text-align:center;
+  font-size:.7rem;color:rgba(245,236,215,.2);
+  padding-top:2rem;border-top:1px solid rgba(245,236,215,.04);
+  letter-spacing:.1em;
+}
+
+/* EXTRAS */
+.steam-container{position:absolute;bottom:0;left:50%;transform:translateX(-50%);pointer-events:none;}
+.steam{
+  position:absolute;bottom:0;width:6px;border-radius:50%;
+  background:rgba(200,149,94,.15);animation:steam 3s infinite ease-out;
+}
+@keyframes steam{
+  0%{transform:translateY(0) scaleX(1);opacity:.6;}
+  100%{transform:translateY(-80px) scaleX(2);opacity:0;}
+}
+
+/* 3D CARD TILT */
+.tilt-card{transform-style:preserve-3d;transition:transform .1s;}
+
+/* MUSIC TOGGLE */
+.music-btn{
+  position:fixed;bottom:2rem;right:2rem;z-index:500;
+  width:48px;height:48px;border-radius:50%;
+  background:rgba(200,149,94,.15);backdrop-filter:blur(12px);
+  border:1px solid rgba(200,149,94,.3);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .3s;font-size:1.2rem;
+}
+.music-btn:hover{background:rgba(200,149,94,.3);transform:scale(1.1);}
+
+/* DARK MODE TOGGLE */
+.theme-btn{
+  position:fixed;bottom:2rem;right:5.5rem;z-index:500;
+  width:48px;height:48px;border-radius:50%;
+  background:rgba(200,149,94,.15);backdrop-filter:blur(12px);
+  border:1px solid rgba(200,149,94,.3);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .3s;font-size:1.1rem;
+}
+.theme-btn:hover{background:rgba(200,149,94,.3);transform:scale(1.1);}
+
+/* CROWD METER */
+.crowd-meter{
+  background:rgba(245,236,215,.04);border:1px solid rgba(245,236,215,.1);
+  border-radius:16px;padding:1.5rem;margin-top:2rem;
+}
+.crowd-title{font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--latte);margin-bottom:1rem;}
+.crowd-bar{height:12px;background:rgba(245,236,215,.08);border-radius:6px;overflow:hidden;}
+.crowd-fill{
+  height:100%;border-radius:6px;width:45%;
+  background:linear-gradient(90deg,#4CAF50,var(--gold));
+  transition:width 2s ease;
+}
+.crowd-labels{display:flex;justify-content:space-between;margin-top:.5rem;}
+.crowd-label{font-size:.65rem;color:rgba(245,236,215,.35);letter-spacing:.1em;text-transform:uppercase;}
+
+/* SCROLL ANIMATIONS */
+.reveal{opacity:0;transform:translateY(40px);transition:all .8s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+.reveal-left{opacity:0;transform:translateX(-40px);transition:all .8s ease;}
+.reveal-left.visible{opacity:1;transform:translateX(0);}
+.reveal-right{opacity:0;transform:translateX(40px);transition:all .8s ease;}
+.reveal-right.visible{opacity:1;transform:translateX(0);}
+
+/* 3D rotating coffee cup */
+.coffee-3d{
+  position:absolute;right:6%;top:20%;width:300px;height:300px;
+  perspective:600px;z-index:4;pointer-events:none;
+}
+.cup-scene{
+  width:100%;height:100%;transform-style:preserve-3d;
+  animation:rotateCup 12s linear infinite;
+}
+@keyframes rotateCup{from{transform:rotateY(0deg) rotateX(10deg);}to{transform:rotateY(360deg) rotateX(10deg);}}
+.cup-face{
+  position:absolute;width:120px;height:120px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:4rem;
+  background:radial-gradient(circle,rgba(200,149,94,.2),rgba(44,26,14,.8));
+  border:1px solid rgba(200,149,94,.2);
+  box-shadow:0 0 40px rgba(200,149,94,.15);
+}
+
+/* PARALLAX ORBS */
+.orb{
+  position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none;
+  animation:orbFloat 8s ease-in-out infinite;
+}
+.orb-1{width:400px;height:400px;background:rgba(200,149,94,.12);top:20%;left:-10%;animation-delay:0s;}
+.orb-2{width:300px;height:300px;background:rgba(212,168,83,.08);top:60%;right:-5%;animation-delay:-3s;}
+.orb-3{width:200px;height:200px;background:rgba(255,179,71,.06);top:40%;left:40%;animation-delay:-5s;}
+@keyframes orbFloat{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-30px) scale(1.05);}}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  nav{padding:1rem 1.5rem;}
+  .nav-links{display:none;}
+  section{padding:5rem 1.5rem;}
+  #reserve,#info{grid-template-columns:1fr;}
+  .gallery-grid{grid-template-columns:1fr 1fr;grid-template-rows:auto;}
+  .gallery-item:first-child{grid-column:span 2;}
+  .vibe-badge{display:none;}
+  .coffee-3d{display:none;}
+}
+
+/* LIGHT THEME */
+body.light{
+  background:#FAF6EF;color:var(--espresso);
+}
+body.light nav{background:rgba(250,246,239,.95);}
+body.light .nav-links a{color:rgba(44,26,14,.6);}
+body.light .hero-title,body.light .section-title{color:var(--espresso);}
+body.light .menu-card{background:rgba(44,26,14,.04);border-color:rgba(44,26,14,.1);}
+body.light .vibe-badge{background:rgba(44,26,14,.06);}
+</style>
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-trail" id="cursorTrail"></div>
+
+<!-- Loading Screen -->
+<div id="loader">
+  <div class="brew-text">Brewing your experience…</div>
+  <div class="brew-bar"></div>
+</div>
+
+<!-- Navigation -->
+<nav id="navbar">
+  <div class="nav-logo">Café <span>Latté</span></div>
+  <ul class="nav-links">
+    <li><a href="#map-section">Explore</a></li>
+    <li><a href="#menu-section">Menu</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#reviews">Reviews</a></li>
+    <li><a href="#info">Info</a></li>
+  </ul>
+  <button class="nav-cta" onclick="scrollToSection('reserve')">Reserve Table</button>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <canvas id="particles-canvas"></canvas>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- 3D Coffee Cup -->
+  <div class="coffee-3d">
+    <div class="cup-scene">
+      <div class="cup-face" style="transform:translateZ(60px)">☕</div>
+      <div class="cup-face" style="transform:rotateY(180deg) translateZ(60px)">🫖</div>
+      <div class="cup-face" style="transform:rotateY(90deg) translateZ(60px)">✨</div>
+      <div class="cup-face" style="transform:rotateY(-90deg) translateZ(60px)">🌙</div>
+    </div>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-eyebrow">Behala Chowrasta · Est. 2019</div>
+    <h1 class="hero-title">
+      Find Your<br><span class="accent">Corner.</span><br>Sip Your<br><span class="accent">Story.</span>
+    </h1>
+    <p class="hero-tagline">Where every seat has a secret, every sip has a memory,<br>and the night doesn't end until 1 AM.</p>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="scrollToSection('menu-section')">🍽️ Explore Menu</button>
+      <button class="btn-outline" onclick="scrollToSection('map-section')">🗺️ Tour the Café</button>
+      <button class="btn-outline" onclick="scrollToSection('reserve')">📅 Reserve Table</button>
+    </div>
+  </div>
+
+  <div class="vibe-badge">
+    <div class="vibe-label"><span class="vibe-dot"></span>Live Vibe</div>
+    <div class="vibe-status">🔥 A Little Busy</div>
+    <div class="vibe-wait">~15 min wait · Open till 1 AM 🌙</div>
+  </div>
+
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- MAP SECTION -->
+<section id="map-section">
+  <div class="section-eyebrow">Interactive Floor Plan</div>
+  <h2 class="section-title reveal">The <em style="color:var(--latte)">Map</em><br>Experience</h2>
+  <p style="color:rgba(245,236,215,.5);max-width:500px;line-height:1.7;margin-bottom:1rem;" class="reveal">
+    Click any zone to discover photos, crowd levels, and the best dishes for that spot. Every corner has a personality.
+  </p>
+
+  <div class="cafe-map reveal">
+    <div class="map-floor">
+      <div class="map-zone zone-coffee" onclick="showZone('coffee')" onmouseenter="showZonePopup(event,'coffee')" onmouseleave="hidePopup()">
+        <div class="zone-icon">☕</div>
+        <div class="zone-name">Coffee Bar</div>
+      </div>
+      <div class="map-zone zone-mural" onclick="showZone('mural')" onmouseenter="showZonePopup(event,'mural')" onmouseleave="hidePopup()">
+        <div class="zone-icon">🎨</div>
+        <div class="zone-name">Mural Wall · Selfie Spot</div>
+      </div>
+      <div class="map-zone zone-dining" onclick="showZone('dining')" onmouseenter="showZonePopup(event,'dining')" onmouseleave="hidePopup()">
+        <div class="zone-icon">🍝</div>
+        <div class="zone-name">Main Dining</div>
+      </div>
+      <div class="map-zone zone-chill" onclick="showZone('chill')" onmouseenter="showZonePopup(event,'chill')" onmouseleave="hidePopup()">
+        <div class="zone-icon">🌿</div>
+        <div class="zone-name">Chill Corner</div>
+      </div>
+      <div class="map-zone zone-bar" onclick="showZone('bar')" onmouseenter="showZonePopup(event,'bar')" onmouseleave="hidePopup()">
+        <div class="zone-icon">🍹</div>
+        <div class="zone-name">Bar Counter</div>
+      </div>
+      <div class="zone-popup" id="zone-popup"></div>
+    </div>
+  </div>
+
+  <!-- Zone Detail Modal -->
+  <div id="zone-modal" style="display:none;position:fixed;inset:0;z-index:2000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);">
+    <div style="background:#1a0f07;border:1px solid rgba(200,149,94,.3);border-radius:24px;padding:2.5rem;max-width:500px;width:90%;position:relative;">
+      <button onclick="closeZoneModal()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--cream);font-size:1.5rem;cursor:pointer;">×</button>
+      <div id="zone-modal-content"></div>
+    </div>
+  </div>
+</section>
+
+<!-- MENU SECTION -->
+<section id="menu-section">
+  <div class="section-eyebrow">What's Cooking</div>
+  <h2 class="section-title reveal">The <em style="color:var(--latte)">Menu</em></h2>
+  <p style="color:rgba(245,236,215,.4);margin-bottom:.5rem;" class="reveal">
+    Indo-Chinese flavors, street-smart recipes, made with soul.
+  </p>
+
+  <div class="menu-tabs reveal">
+    <button class="menu-tab active" onclick="switchTab('starters',this)">🔥 Starters</button>
+    <button class="menu-tab" onclick="switchTab('main',this)">🍽️ Main Course</button>
+    <button class="menu-tab" onclick="switchTab('rice',this)">🍚 Fried Rice</button>
+    <button class="menu-tab" onclick="switchTab('noodles',this)">🍜 Noodles</button>
+    <button class="menu-tab" onclick="switchTab('sizzlers',this)">🔥 Sizzlers</button>
+  </div>
+
+  <!-- STARTERS -->
+  <div id="tab-starters" class="menu-section-visible">
+    <div class="menu-grid reveal">
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🥔</div><div class="menu-card-name">Chilli Potato</div><div class="menu-card-desc">Garlic, zinger, diced green chilli, onion, capsicum, soya sauce</div><div class="menu-card-footer"><span class="menu-price">₹225</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🥔</div><div class="menu-card-name">Crispy Chilli Potato</div><div class="menu-card-desc">Garlic, zinger, chilli, onion, capsicum, tomato ketchup, chilli paste</div><div class="menu-card-footer"><span class="menu-price">₹249</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🍯</div><div class="menu-card-name">Crispy Honey Chilli Potato</div><div class="menu-card-desc">Garlic, zinger, green chilli, onion, coriander, soya sauce, chilli oil</div><div class="menu-card-footer"><span class="menu-price">₹275</span><span class="menu-tag">🔥 Crowd Fave</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🌽</div><div class="menu-card-name">Crispy Chilli Babycorn</div><div class="menu-card-desc">Garlic, zinger, chilli, onion, bell pepper, tomato ketchup, honey</div><div class="menu-card-footer"><span class="menu-price">₹249</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🥦</div><div class="menu-card-name">Veg Manchurian Dry</div><div class="menu-card-desc">Garlic, zinger, chilli, onion, tomato ketchup, chilli paste, vinegar</div><div class="menu-card-footer"><span class="menu-price">₹225</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🍄</div><div class="menu-card-name">Chilli Mushroom</div><div class="menu-card-desc">Babycorn, mushroom, carrot, capsicum, potato, broccoli, garlic</div><div class="menu-card-footer"><span class="menu-price">₹249</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🍄</div><div class="menu-card-name">Crispy Chilli Mushroom</div><div class="menu-card-desc">Mushroom, garlic, zinger, diced chilli, soya sauce, oyster sauce</div><div class="menu-card-footer"><span class="menu-price">₹275</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🌽</div><div class="menu-card-name">Golden Fried Babycorn</div><div class="menu-card-desc">Maida and corn flour batter, baking powder — crispy golden goodness</div><div class="menu-card-footer"><span class="menu-price">₹249</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🧀</div><div class="menu-card-name">Chilli Paneer</div><div class="menu-card-desc">Mixed veggies, garlic, zinger, onion, chilli — a vegetarian classic</div><div class="menu-card-footer"><span class="menu-price">₹275</span><span class="menu-tag">🔥 Crowd Fave</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🍗</div><div class="menu-card-name">Chilli Chicken Dry</div><div class="menu-card-desc">Mushroom, garlic, onion, chilli, basil, bell pepper, oyster sauce</div><div class="menu-card-footer"><span class="menu-price">₹249</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🍗</div><div class="menu-card-name">Chilli Garlic Chicken (8 pcs)</div><div class="menu-card-desc">Garlic, zinger, diced chilli, onion, capsicum, soya sauce</div><div class="menu-card-footer"><span class="menu-price">₹275</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🍗</div><div class="menu-card-name">Chicken 65</div><div class="menu-card-desc">Boneless chicken, yoghurt, green chilli, red chilli powder, curry leaves</div><div class="menu-card-footer"><span class="menu-price">₹275</span><span class="menu-tag">⭐ Signature</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🍗</div><div class="menu-card-name">Drums of Heaven</div><div class="menu-card-desc">Garlic, zinger, green chilli, onion, capsicum, soya sauce</div><div class="menu-card-footer"><span class="menu-price">₹275</span><span class="menu-tag">🔥 Crowd Fave</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🍗</div><div class="menu-card-name">Honey Crispy Chicken</div><div class="menu-card-desc">Garlic, zinger, chilli, onion, tomato ketchup, chilli paste, vinegar</div><div class="menu-card-footer"><span class="menu-price">₹299</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🍗</div><div class="menu-card-name">Chicken Wings Hong Kong Style</div><div class="menu-card-desc">Garlic, zinger, chilli, onion, tomato ketchup, chilli paste, honey</div><div class="menu-card-footer"><span class="menu-price">₹275</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🌶️</div><div class="menu-card-name">Chicken Peri Peri Hot Wings</div><div class="menu-card-desc">Black pepper, dried basil, mixed herbs, olive oil, sautéed veggies</div><div class="menu-card-footer"><span class="menu-price">₹299</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🐟</div><div class="menu-card-name">Chilli Fish (6 pcs)</div><div class="menu-card-desc">Garlic, onion, green chilli, celery, bell pepper, tomato ketchup</div><div class="menu-card-footer"><span class="menu-price">₹349</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🐟</div><div class="menu-card-name">Pan Fried Chilli Fish (6 pcs)</div><div class="menu-card-desc">Garlic, zinger, onion, chilli, bell pepper, black pepper, chilli oil</div><div class="menu-card-footer"><span class="menu-price">₹375</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🐟</div><div class="menu-card-name">Star Crispy Fish (6 pcs)</div><div class="menu-card-desc">Grilled Vietnam Basa fish, Italian herbs, sautéed veggies</div><div class="menu-card-footer"><span class="menu-price">₹375</span><span class="menu-tag">⭐ Signature</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🐟</div><div class="menu-card-name">Devil Fish (6 pcs)</div><div class="menu-card-desc">Garlic & zinger, diced chilli, capsicum, soya sauce — fiery!</div><div class="menu-card-footer"><span class="menu-price">₹375</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🦐</div><div class="menu-card-name">Golden Fried Prawns (6 pcs)</div><div class="menu-card-desc">Garlic, zinger, onion, chilli, bell pepper, soya sauce</div><div class="menu-card-footer"><span class="menu-price">₹399</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🦐</div><div class="menu-card-name">Chilli Prawn (6 pcs)</div><div class="menu-card-desc">Garlic, onion, oyster sauce, soya sauce — classic prawn starter</div><div class="menu-card-footer"><span class="menu-price">₹425</span><span class="menu-tag">🔥 Crowd Fave</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🦐</div><div class="menu-card-name">Black Pepper Garlic Prawn</div><div class="menu-card-desc">Succulent prawns, bold garlic sauce, black pepper kick</div><div class="menu-card-footer"><span class="menu-price">₹425</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🦐</div><div class="menu-card-name">Sweet Chilli Prawn (6 pcs)</div><div class="menu-card-desc">Sticky sweet & tangy chili sauce — irresistible bites</div><div class="menu-card-footer"><span class="menu-price">₹425</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🧀</div><div class="menu-card-name">Crispy Chilli Paneer</div><div class="menu-card-desc">Mixed veggies, garlic, zinger, onion, chilli — crispy outside, soft inside</div><div class="menu-card-footer"><span class="menu-price">₹299</span><span class="menu-tag">🌱 Veg</span></div></div>
+    </div>
+  </div>
+
+  <!-- MAIN COURSE -->
+  <div id="tab-main" class="menu-section-hidden">
+    <div class="menu-grid reveal">
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🥢</div><div class="menu-card-name">Sweet and Sour</div><div class="menu-card-desc">Vibrant blend of sugary sweetness with tangy, zesty kick</div><div class="menu-card-footer"><span class="menu-price">₹249</span><span class="menu-tag">🌱 Veg</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🥦</div><div class="menu-card-name">Veg Manchurian</div><div class="menu-card-desc">Crispy vegetable balls in flavorful, tangy, spicy sauce</div><div class="menu-card-footer"><span class="menu-price">₹225</span><span class="menu-tag">🌱 Veg</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🌽</div><div class="menu-card-name">Chilli Babycorn</div><div class="menu-card-desc">Crispy, golden-fried babycorn in spicy tangy sauce</div><div class="menu-card-footer"><span class="menu-price">₹249</span><span class="menu-tag">🌱 Veg</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🍄</div><div class="menu-card-name">Chilly Mushroom</div><div class="menu-card-desc">Tender mushrooms tossed in spicy, tangy sauce with bell peppers</div><div class="menu-card-footer"><span class="menu-price">₹225</span><span class="menu-tag">🌱 Veg</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🍗</div><div class="menu-card-name">Chilli Chicken</div><div class="menu-card-desc">Tender chicken in bold, tangy sauce with peppers, onions, spices</div><div class="menu-card-footer"><span class="menu-price">₹299</span><span class="menu-tag">🔥 Crowd Fave</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🍗</div><div class="menu-card-name">Chicken Manchurian</div><div class="menu-card-desc">Crispy chicken in savory, tangy, slightly spicy sauce</div><div class="menu-card-footer"><span class="menu-price">₹299</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🧄</div><div class="menu-card-name">Chicken Hot Garlic</div><div class="menu-card-desc">Tender chicken in bold, garlicky sauce with a spicy kick</div><div class="menu-card-footer"><span class="menu-price">₹299</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🍋</div><div class="menu-card-name">Chicken Sweet and Sour</div><div class="menu-card-desc">Tender chicken in tangy sauce with perfect sweetness balance</div><div class="menu-card-footer"><span class="menu-price">₹299</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🧈</div><div class="menu-card-name">Chicken Butter Garlic</div><div class="menu-card-desc">Rich, creamy buttery garlic sauce with aromatic herbs</div><div class="menu-card-footer"><span class="menu-price">₹349</span><span class="menu-tag">⭐ Premium</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🌶️</div><div class="menu-card-name">Schezwan Chicken</div><div class="menu-card-desc">Bold Schezwan sauce, garlic, chilies, aromatic spices — fiery!</div><div class="menu-card-footer"><span class="menu-price">₹349</span><span class="menu-tag">🔥 Crowd Fave</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🦪</div><div class="menu-card-name">Chilli Oyster Chicken</div><div class="menu-card-desc">Rich, tangy oyster sauce, spicy chilies — umami heaven</div><div class="menu-card-footer"><span class="menu-price">₹349</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🐟</div><div class="menu-card-name">Chilli Fish</div><div class="menu-card-desc">Crispy fried fish in spicy tangy sauce with bell peppers</div><div class="menu-card-footer"><span class="menu-price">₹375</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🐟</div><div class="menu-card-name">Fish Hot Garlic</div><div class="menu-card-desc">Crispy fish in spicy aromatic hot garlic sauce</div><div class="menu-card-footer"><span class="menu-price">₹399</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🐟</div><div class="menu-card-name">Schezwan Fish</div><div class="menu-card-desc">Tender fish in fiery Schezwan sauce, garlic, chilies</div><div class="menu-card-footer"><span class="menu-price">₹399</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🍋</div><div class="menu-card-name">Lemon Fish</div><div class="menu-card-desc">Yellowtail Snapper — delicate, sweet flavor, tender texture</div><div class="menu-card-footer"><span class="menu-price">₹399</span><span class="menu-tag">⭐ Signature</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🦐</div><div class="menu-card-name">Chilly Prawn</div><div class="menu-card-desc">Succulent prawns stir-fried in spicy, tangy sauce with garlic</div><div class="menu-card-footer"><span class="menu-price">₹449</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🧈</div><div class="menu-card-name">Prawn Butter Garlic</div><div class="menu-card-desc">Rich, creamy butter sauce infused with bold garlic flavors</div><div class="menu-card-footer"><span class="menu-price">₹475</span><span class="menu-tag">⭐ Premium</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🦐</div><div class="menu-card-name">Schezwan Prawn</div><div class="menu-card-desc">Bold, spicy Schezwan sauce — fiery, aromatic, irresistible</div><div class="menu-card-footer"><span class="menu-price">₹475</span><span class="menu-tag">🔥 Crowd Fave</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🍋</div><div class="menu-card-name">Lemon Prawn</div><div class="menu-card-desc">Light, zesty lemon sauce with garlic and herbs — refreshing!</div><div class="menu-card-footer"><span class="menu-price">₹475</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🧀</div><div class="menu-card-name">Chilli Paneer</div><div class="menu-card-desc">Crispy paneer cubes in spicy, tangy sauce with garlic and chili</div><div class="menu-card-footer"><span class="menu-price">₹275</span><span class="menu-tag">🌱 Veg</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🫑</div><div class="menu-card-name">Veg Paprika</div><div class="menu-card-desc">Mixed vegetables in savory paprika-based sauce — smoky sweetness</div><div class="menu-card-footer"><span class="menu-price">₹249</span><span class="menu-tag">🌱 Veg</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🌑</div><div class="menu-card-name">Black Pepper Chicken</div><div class="menu-card-desc">Garlic, zinger, chilli, bell pepper, oyster & chilli paste</div><div class="menu-card-footer"><span class="menu-price">₹375</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🫑</div><div class="menu-card-name">Chicken Paprika</div><div class="menu-card-desc">Zinger, bell pepper, light & dark soya, Chinese wine</div><div class="menu-card-footer"><span class="menu-price">₹375</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🐟</div><div class="menu-card-name">Sweet Chilli Fish</div><div class="menu-card-desc">Tender fish fillets coated in sweet, tangy chili sauce</div><div class="menu-card-footer"><span class="menu-price">₹399</span></div></div>
+    </div>
+  </div>
+
+  <!-- FRIED RICE -->
+  <div id="tab-rice" class="menu-section-hidden">
+    <div class="menu-grid reveal">
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🥦</div><div class="menu-card-name">Veg Rice</div><div class="menu-card-desc">Classic fried rice with garden fresh vegetables</div><div class="menu-card-footer"><span class="menu-price">₹225</span><span class="menu-tag">🌱 Veg</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🌶️</div><div class="menu-card-name">Veg Schezwan Rice</div><div class="menu-card-desc">Fiery Schezwan sauce with crisp vegetables</div><div class="menu-card-footer"><span class="menu-price">₹225</span><span class="menu-tag">🌱 Veg</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🧄</div><div class="menu-card-name">Veg Burnt Garlic Rice</div><div class="menu-card-desc">Smoky burnt garlic aroma with mixed vegetables</div><div class="menu-card-footer"><span class="menu-price">₹249</span><span class="menu-tag">🌱 Veg</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🍄</div><div class="menu-card-name">Veg Mushroom and Basil Rice</div><div class="menu-card-desc">Earthy mushrooms with aromatic basil — comfort food</div><div class="menu-card-footer"><span class="menu-price">₹249</span><span class="menu-tag">🌱 Veg</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🥚</div><div class="menu-card-name">Egg Rice</div><div class="menu-card-desc">Fluffy scrambled eggs woven through perfectly fried rice</div><div class="menu-card-footer"><span class="menu-price">₹249</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🥚</div><div class="menu-card-name">Egg Schezwan Rice</div><div class="menu-card-desc">Eggs + fiery Schezwan = a bold, tangy combination</div><div class="menu-card-footer"><span class="menu-price">₹249</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🥚</div><div class="menu-card-name">Egg Burnt Garlic Rice</div><div class="menu-card-desc">Egg fried rice with deep smoky burnt garlic notes</div><div class="menu-card-footer"><span class="menu-price">₹275</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🍗</div><div class="menu-card-name">Chicken Rice</div><div class="menu-card-desc">Tender chicken pieces with aromatic fried rice</div><div class="menu-card-footer"><span class="menu-price">₹275</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🌶️</div><div class="menu-card-name">Chicken Schezwan Rice</div><div class="menu-card-desc">Chicken + Schezwan sauce — bold and satisfying</div><div class="menu-card-footer"><span class="menu-price">₹275</span><span class="menu-tag">🔥 Crowd Fave</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🧄</div><div class="menu-card-name">Chicken Burnt Garlic Rice</div><div class="menu-card-desc">Smoky, aromatic, packed with tender chicken bites</div><div class="menu-card-footer"><span class="menu-price">₹299</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🍗</div><div class="menu-card-name">Chicken Manchurian Rice</div><div class="menu-card-desc">Manchurian sauce meets fluffy fried rice — a crowd winner</div><div class="menu-card-footer"><span class="menu-price">₹325</span><span class="menu-tag">🔥 Crowd Fave</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🍄</div><div class="menu-card-name">Chicken Mushroom and Basil Rice</div><div class="menu-card-desc">Chicken, mushrooms, basil — the holy trinity of comfort</div><div class="menu-card-footer"><span class="menu-price">₹325</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🌊</div><div class="menu-card-name">Mixed Rice</div><div class="menu-card-desc">A blend of chicken, egg & veggies in one hearty bowl</div><div class="menu-card-footer"><span class="menu-price">₹299</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🌶️</div><div class="menu-card-name">Mixed Schezwan Rice</div><div class="menu-card-desc">Full mixed proteins in Schezwan sauce</div><div class="menu-card-footer"><span class="menu-price">₹349</span><span class="menu-tag">⭐ Signature</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🧄</div><div class="menu-card-name">Chilli Garlic Rice</div><div class="menu-card-desc">Egg chilli garlic rice — zesty and aromatic</div><div class="menu-card-footer"><span class="menu-price">₹275</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">✨</div><div class="menu-card-name">Special Mixed Rice</div><div class="menu-card-desc">Chef's special — the ultimate mixed fried rice experience</div><div class="menu-card-footer"><span class="menu-price">₹449</span><span class="menu-tag">⭐ Signature</span></div></div>
+    </div>
+  </div>
+
+  <!-- NOODLES -->
+  <div id="tab-noodles" class="menu-section-hidden">
+    <div class="menu-grid reveal">
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🍜</div><div class="menu-card-name">Veg Hakka Noodles</div><div class="menu-card-desc">Stir-fried with mixed vegetables and savory sauces</div><div class="menu-card-footer"><span class="menu-price">₹225</span><span class="menu-tag">🌱 Veg</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🌶️</div><div class="menu-card-name">Veg Schezwan Noodles</div><div class="menu-card-desc">Spicy, stir-fried noodles with bold Schezwan fire</div><div class="menu-card-footer"><span class="menu-price">₹225</span><span class="menu-tag">🌱 Veg</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🧄</div><div class="menu-card-name">Veg Burnt Garlic Noodles</div><div class="menu-card-desc">Smoky burnt garlic aroma enhancing every noodle strand</div><div class="menu-card-footer"><span class="menu-price">₹249</span><span class="menu-tag">🌱 Veg</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🍜</div><div class="menu-card-name">Veg Manchurian Noodles</div><div class="menu-card-desc">Noodles with crispy veggie Manchurian balls in tangy sauce</div><div class="menu-card-footer"><span class="menu-price">₹249</span><span class="menu-tag">🔥 Crowd Fave</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🥚</div><div class="menu-card-name">Egg Hakka Noodles</div><div class="menu-card-desc">Noodles with scrambled eggs, crunchy vegetables, savory seasonings</div><div class="menu-card-footer"><span class="menu-price">₹249</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🥚</div><div class="menu-card-name">Egg Burnt Garlic Noodles</div><div class="menu-card-desc">Egg noodles with crispy, aromatic burnt garlic — savory & smoky</div><div class="menu-card-footer"><span class="menu-price">₹275</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🍗</div><div class="menu-card-name">Chicken Hakka Noodles</div><div class="menu-card-desc">Tender chicken, noodles, vegetables in soy-based sauce</div><div class="menu-card-footer"><span class="menu-price">₹275</span><span class="menu-tag">🔥 Crowd Fave</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🌶️</div><div class="menu-card-name">Chicken Chilli Garlic Noodles</div><div class="menu-card-desc">Spicy aromatic garlic-chili sauce with tender chicken</div><div class="menu-card-footer"><span class="menu-price">₹299</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🌶️</div><div class="menu-card-name">Chicken Schezwan Noodles</div><div class="menu-card-desc">Bold Schezwan fire with chicken and vibrant vegetables</div><div class="menu-card-footer"><span class="menu-price">₹275</span><span class="menu-tag">⭐ Signature</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🧄</div><div class="menu-card-name">Chicken Burnt Garlic Noodles</div><div class="menu-card-desc">Smoky garlicky depth with tender chicken bites</div><div class="menu-card-footer"><span class="menu-price">₹299</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🍜</div><div class="menu-card-name">Chicken Gravy Noodles</div><div class="menu-card-desc">Tender chicken smothered in rich, flavorful gravy</div><div class="menu-card-footer"><span class="menu-price">₹325</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🌊</div><div class="menu-card-name">Mixed Hakka Noodles</div><div class="menu-card-desc">Vibrant stir-fried mix of vegetables and proteins</div><div class="menu-card-footer"><span class="menu-price">₹325</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🌶️</div><div class="menu-card-name">Mixed Schezwan Noodles</div><div class="menu-card-desc">Full protein medley in bold, fiery Schezwan</div><div class="menu-card-footer"><span class="menu-price">₹349</span><span class="menu-tag">🔥 Crowd Fave</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">✨</div><div class="menu-card-name">Mixed Special Noodles</div><div class="menu-card-desc">The ultimate noodle experience — chef's special blend</div><div class="menu-card-footer"><span class="menu-price">₹449</span><span class="menu-tag">⭐ Signature</span></div></div>
+    </div>
+  </div>
+
+  <!-- SIZZLERS -->
+  <div id="tab-sizzlers" class="menu-section-hidden">
+    <div class="menu-grid reveal">
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🍗</div><div class="menu-card-name">Grilled Chicken with Sautéed Veggies</div><div class="menu-card-desc">Tender grilled chicken, fresh sautéed vegetables, crispy diced potatoes</div><div class="menu-card-footer"><span class="menu-price">₹449</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🐟</div><div class="menu-card-name">Grilled Fish with Sautéed Veggies</div><div class="menu-card-desc">Light, tender grilled fish with sautéed vegetables & diced potato</div><div class="menu-card-footer"><span class="menu-price">₹499</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🥩</div><div class="menu-card-name">Chicken Steak with Mashed Potato</div><div class="menu-card-desc">Juicy chicken steak, sautéed vegetables, creamy mashed potatoes</div><div class="menu-card-footer"><span class="menu-price">₹499</span><span class="menu-tag">🔥 Crowd Fave</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🐟</div><div class="menu-card-name">Fish Steak with Mashed Potato</div><div class="menu-card-desc">Perfectly cooked fish steak, sautéed veggies, creamy mash</div><div class="menu-card-footer"><span class="menu-price">₹525</span><span class="menu-tag">⭐ Premium</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🌭</div><div class="menu-card-name">Chicken Sausage Kebab Platter</div><div class="menu-card-desc">Juicy grilled chicken sausages with fresh salad, naan or rice</div><div class="menu-card-footer"><span class="menu-price">₹499</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🍲</div><div class="menu-card-name">Chicken Stroganoff</div><div class="menu-card-desc">Rich, creamy mushroom & onion sauce, touch of sour cream</div><div class="menu-card-footer"><span class="menu-price">₹549</span><span class="menu-tag">⭐ Signature</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🥗</div><div class="menu-card-name">Veggie Platter</div><div class="menu-card-desc">Colorful assortment of seasonal vegetables with dips</div><div class="menu-card-footer"><span class="menu-price">₹375</span><span class="menu-tag">🌱 Veg</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🍗</div><div class="menu-card-name">Chicken Platter</div><div class="menu-card-desc">Selection of tender, juicy chicken pieces with sides</div><div class="menu-card-footer"><span class="menu-price">₹425</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🐟</div><div class="menu-card-name">Fish Platter</div><div class="menu-card-desc">Variety of perfectly cooked fish with sides</div><div class="menu-card-footer"><span class="menu-price">₹499</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🦐</div><div class="menu-card-name">Prawn Platter</div><div class="menu-card-desc">Succulent prawns, grilled or sautéed, with fresh sides</div><div class="menu-card-footer"><span class="menu-price">₹499</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🌟</div><div class="menu-card-name">Mix Platter</div><div class="menu-card-desc">Chicken, fish & prawns — everything in one glorious platter</div><div class="menu-card-footer"><span class="menu-price">₹549</span><span class="menu-tag">🔥 Crowd Fave</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🍋</div><div class="menu-card-name">Grilled Lemon Butter Fish</div><div class="menu-card-desc">Grilled fish fillet, zesty lemon, rich butter sauce — refined elegance</div><div class="menu-card-footer"><span class="menu-price">₹549</span><span class="menu-tag">⭐ Premium</span></div></div>
+      <div class="menu-card tilt-card"><div class="menu-card-emoji">🧀</div><div class="menu-card-name">Paneer Platter</div><div class="menu-card-desc">Grilled, fried, or sautéed paneer cubes with vibrant accompaniments</div><div class="menu-card-footer"><span class="menu-price">₹425</span><span class="menu-tag">🌱 Veg</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery">
+  <div class="section-eyebrow">Vibes & Moments</div>
+  <h2 class="section-title reveal">The <em style="color:var(--latte)">Gallery</em></h2>
+  <p style="color:rgba(245,236,215,.4);margin-bottom:.5rem;" class="reveal">
+    Real moments. Real vibes. Tag us with <strong style="color:var(--latte)">#CafeLatteVibes</strong>
+  </p>
+  <div class="gallery-grid reveal">
+    <div class="gallery-item">
+      <div style="background:linear-gradient(135deg,#2c1a0e,#5c3a1e);width:100%;height:100%;"></div>
+      <div class="gallery-emoji">🌙</div>
+      <div class="gallery-overlay"><span class="gallery-caption">Late night vibes · 11 PM</span></div>
+    </div>
+    <div class="gallery-item">
+      <div style="background:linear-gradient(135deg,#1a0f07,#3d2412);width:100%;height:100%;"></div>
+      <div class="gallery-emoji">☕</div>
+      <div class="gallery-overlay"><span class="gallery-caption">The perfect sip</span></div>
+    </div>
+    <div class="gallery-item">
+      <div style="background:linear-gradient(135deg,#0d0803,#2c1a0e);width:100%;height:100%;"></div>
+      <div class="gallery-emoji">🎨</div>
+      <div class="gallery-overlay"><span class="gallery-caption">Mural wall · selfie heaven</span></div>
+    </div>
+    <div class="gallery-item" style="grid-column:span 2;">
+      <div style="background:linear-gradient(135deg,#3d2412,#5c3a1e,#2c1a0e);width:100%;height:100%;"></div>
+      <div class="gallery-emoji" style="font-size:3rem;">🍝</div>
+      <div class="gallery-overlay"><span class="gallery-caption">Chef's special · Chicken Manchurian + Hakka</span></div>
+    </div>
+    <div class="gallery-item">
+      <div style="background:linear-gradient(135deg,#1a0f07,#2c1a0e);width:100%;height:100%;"></div>
+      <div class="gallery-emoji">🌿</div>
+      <div class="gallery-overlay"><span class="gallery-caption">Chill corner · just you & your thoughts</span></div>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:2.5rem;" class="reveal">
+    <button class="btn-outline" onclick="alert('Upload feature coming soon! For now, tag us on Instagram with #CafeLatteVibes 📸')">📸 Upload Your Moment</button>
+  </div>
+</section>
+
+<!-- RESERVE -->
+<section id="reserve" style="display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:start;background:#0D0803;">
+  <div class="reveal-left">
+    <div class="section-eyebrow">Book a Spot</div>
+    <h2 class="section-title">Reserve<br><em style="color:var(--latte)">Your Table</em></h2>
+    <p style="color:rgba(245,236,215,.45);line-height:1.7;margin-bottom:2rem;">
+      Grab your corner before someone else does. Open daily, 11 AM – 1 AM.
+    </p>
+    <div class="reserve-card">
+      <div class="form-group">
+        <label class="form-label">Your Name</label>
+        <input type="text" class="form-input" placeholder="e.g. Priya Sharma"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date</label>
+        <input type="date" class="form-input"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Party Size</label>
+        <select class="form-input">
+          <option>1 person</option><option>2 people</option><option>3–4 people</option>
+          <option>5–6 people</option><option>7+ people</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Pick a Time</label>
+        <div class="time-slots">
+          <div class="time-slot" onclick="selectTime(this)">7 PM</div>
+          <div class="time-slot" onclick="selectTime(this)">8 PM</div>
+          <div class="time-slot active" onclick="selectTime(this)">9 PM</div>
+          <div class="time-slot" onclick="selectTime(this)">10 PM</div>
+          <div class="time-slot" onclick="selectTime(this)">11 PM</div>
+          <div class="time-slot" onclick="selectTime(this)">12 AM</div>
+        </div>
+      </div>
+      <button class="btn-primary" style="width:100%;justify-content:center;" onclick="confirmReservation()">✨ Confirm Reservation</button>
+    </div>
+  </div>
+
+  <div class="reveal-right">
+    <div class="section-eyebrow">Order Online</div>
+    <h2 class="section-title">Order<br><em style="color:var(--latte)">Delivery</em></h2>
+    <p style="color:rgba(245,236,215,.45);line-height:1.7;margin-bottom:2rem;">
+      Can't make it tonight? We deliver the vibe straight to your door.
+    </p>
+    <div class="order-cards">
+      <a class="order-card" href="#" onclick="return false;">
+        <div class="order-icon">🔴</div>
+        <div><div class="order-name">Zomato</div><div class="order-sub">30–45 min delivery</div></div>
+        <div class="order-arrow">→</div>
+      </a>
+      <a class="order-card" href="#" onclick="return false;">
+        <div class="order-icon">🟠</div>
+        <div><div class="order-name">Swiggy</div><div class="order-sub">25–40 min delivery</div></div>
+        <div class="order-arrow">→</div>
+      </a>
+      <a class="order-card" href="#" onclick="return false;">
+        <div class="order-icon">🟢</div>
+        <div><div class="order-name">EazyDiner</div><div class="order-sub">Table + delivery</div></div>
+        <div class="order-arrow">→</div>
+      </a>
+    </div>
+    <div class="crowd-meter" style="margin-top:2.5rem;">
+      <div class="crowd-title">Live Crowd Meter</div>
+      <div class="crowd-bar"><div class="crowd-fill" id="crowd-fill" style="width:45%;"></div></div>
+      <div class="crowd-labels">
+        <span class="crowd-label">Quiet</span>
+        <span class="crowd-label" style="color:var(--neon-amber);">A little busy ✓</span>
+        <span class="crowd-label">Packed</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section id="reviews">
+  <div class="section-eyebrow">What People Say</div>
+  <h2 class="section-title reveal">The <em style="color:var(--latte)">Love</em></h2>
+  <div class="rating-hero reveal">
+    <div class="rating-number">4.4</div>
+    <div>
+      <div class="rating-stars">★★★★☆</div>
+      <div class="rating-count">Based on 1,700+ reviews</div>
+    </div>
+  </div>
+  <div class="reviews-scroll reveal">
+    <div class="review-card"><div class="review-stars">★★★★★</div><div class="review-text">"Best chill spot in Behala, hands down. The vibe at midnight is unmatched."</div><div class="review-author">— Riya M. · Google</div></div>
+    <div class="review-card"><div class="review-stars">★★★★★</div><div class="review-text">"Affordable + aesthetic?? Say less. The Drums of Heaven are out of this world."</div><div class="review-author">— Ayan K. · Zomato</div></div>
+    <div class="review-card"><div class="review-stars">★★★★☆</div><div class="review-text">"Came for dinner, stayed till 1 AM. The mural wall is everything for photos."</div><div class="review-author">— Sneha D. · Swiggy</div></div>
+    <div class="review-card"><div class="review-stars">★★★★★</div><div class="review-text">"Schezwan chicken + burnt garlic noodles = my life is complete. Period."</div><div class="review-author">— Rohit B. · Google</div></div>
+    <div class="review-card"><div class="review-stars">★★★★★</div><div class="review-text">"The Chicken Stroganoff? Honestly didn't expect it to slap this hard at a Chinese place."</div><div class="review-author">— Priya S. · Zomato</div></div>
+    <div class="review-card"><div class="review-stars">★★★★☆</div><div class="review-text">"Night café energy is real. Cozy, dark, great food, late closing. My second home."</div><div class="review-author">— Dev G. · Google</div></div>
+  </div>
+</section>
+
+<!-- INFO -->
+<section id="info" style="display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start;background:#0D0803;padding-bottom:8rem;">
+  <div class="reveal-left">
+    <div class="section-eyebrow">Find Us</div>
+    <h2 class="section-title">Café <em style="color:var(--latte)">Info</em></h2>
+    <div class="info-block">
+      <div class="info-icon">📍</div>
+      <div class="info-label">Address</div>
+      <div class="info-value">Behala Chowrasta, Kolkata</div>
+      <div class="info-sub">West Bengal, India</div>
+    </div>
+    <div class="info-block">
+      <div class="info-icon">⏰</div>
+      <div class="info-label">Hours</div>
+      <div class="info-value">11:00 AM – 1:00 AM</div>
+      <div class="info-sub">Open 7 days a week 🌙</div>
+    </div>
+    <div class="info-block">
+      <div class="info-icon">📞</div>
+      <div class="info-label">Reservations</div>
+      <div class="info-value">Call or walk in</div>
+      <div class="info-sub">No booking fees</div>
+    </div>
+    <a class="directions-btn" href="https://maps.google.com/?q=Behala+Chowrasta+Kolkata" target="_blank">
+      🗺️ Get Directions
+    </a>
+  </div>
+  <div class="reveal-right">
+    <div class="section-eyebrow">Popular Times</div>
+    <h3 style="font-family:'Playfair Display',serif;font-size:1.5rem;margin-bottom:1.5rem;">When to Visit</h3>
+    <div class="hours-graph">
+      <div class="hours-bar-row"><span class="hours-day">MON</span><div class="hours-bar"><div class="hours-fill" style="width:40%"></div></div></div>
+      <div class="hours-bar-row"><span class="hours-day">TUE</span><div class="hours-bar"><div class="hours-fill" style="width:35%"></div></div></div>
+      <div class="hours-bar-row"><span class="hours-day">WED</span><div class="hours-bar"><div class="hours-fill" style="width:50%"></div></div></div>
+      <div class="hours-bar-row"><span class="hours-day">THU</span><div class="hours-bar"><div class="hours-fill" style="width:60%"></div></div></div>
+      <div class="hours-bar-row"><span class="hours-day">FRI</span><div class="hours-bar"><div class="hours-fill" style="width:90%"></div></div></div>
+      <div class="hours-bar-row"><span class="hours-day">SAT</span><div class="hours-bar"><div class="hours-fill" style="width:100%"></div></div></div>
+      <div class="hours-bar-row"><span class="hours-day">SUN</span><div class="hours-bar"><div class="hours-fill" style="width:85%"></div></div></div>
+    </div>
+    <p style="font-size:.75rem;color:rgba(245,236,215,.35);margin-top:1.5rem;letter-spacing:.08em;">Best time to visit: weekday evenings 8–10 PM for a chill experience.</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="footer-logo">Café <span>Latté</span></div>
+    <div class="footer-tagline">Find your corner. Sip your story.</div>
+  </div>
+  <ul class="footer-links">
+    <li><a href="#hero">Home</a></li>
+    <li><a href="#menu-section">Menu</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#reserve">Reserve</a></li>
+  </ul>
+  <div class="footer-hashtag">#CafeLatteVibes</div>
+  <div class="footer-copy">© 2025 Café Latté · Behala Chowrasta, Kolkata · Open till 1 AM 🌙</div>
+</footer>
+
+<!-- Floating Buttons -->
+<button class="music-btn" id="musicBtn" onclick="toggleMusic()" title="Toggle lo-fi music">🎵</button>
+<button class="theme-btn" onclick="toggleTheme()" title="Toggle light/dark">🌙</button>
+
+<!-- Zone Modal Overlay -->
+<div id="zone-overlay" style="display:none;position:fixed;inset:0;z-index:1999;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);" onclick="closeZoneModal()"></div>
+<div id="zone-modal-wrapper" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2000;background:#1a0f07;border:1px solid rgba(200,149,94,.3);border-radius:24px;padding:2.5rem;max-width:500px;width:90%;">
+  <button onclick="closeZoneModal()" style="position:absolute;top:1rem;right:1.5rem;background:none;border:none;color:var(--cream);font-size:2rem;cursor:pointer;line-height:1;">×</button>
+  <div id="zone-modal-content"></div>
+</div>
+
+<script>
+// ══════════════════════════════════════
+// LOADER
+// ══════════════════════════════════════
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    const loader=document.getElementById('loader');
+    loader.style.opacity='0';
+    setTimeout(()=>loader.style.display='none',800);
+  },1800);
+});
+
+// ══════════════════════════════════════
+// CURSOR
+// ══════════════════════════════════════
+const cursor=document.getElementById('cursor');
+const trail=document.getElementById('cursorTrail');
+let mx=0,my=0,tx=0,ty=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  cursor.style.left=mx+'px';cursor.style.top=my+'px';
+});
+(function animTrail(){
+  tx+=(mx-tx)*.12;ty+=(my-ty)*.12;
+  trail.style.left=tx+'px';trail.style.top=ty+'px';
+  requestAnimationFrame(animTrail);
+})();
+document.querySelectorAll('button,a,.menu-card,.gallery-item,.map-zone').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cursor.style.transform='translate(-50%,-50%) scale(2)';trail.style.transform='translate(-50%,-50%) scale(0.5)';});
+  el.addEventListener('mouseleave',()=>{cursor.style.transform='translate(-50%,-50%) scale(1)';trail.style.transform='translate(-50%,-50%) scale(1)';});
+});
+
+// ══════════════════════════════════════
+// NAV SCROLL
+// ══════════════════════════════════════
+window.addEventListener('scroll',()=>{
+  document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>50);
+});
+
+// ══════════════════════════════════════
+// PARTICLES CANVAS (3D Coffee Steam)
+// ══════════════════════════════════════
+const canvas=document.getElementById('particles-canvas');
+const ctx=canvas.getContext('2d');
+let W,H;
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+resize();window.addEventListener('resize',resize);
+
+const particles=[];
+for(let i=0;i<80;i++){
+  particles.push({
+    x:Math.random()*1.5,y:Math.random(),z:Math.random(),
+    vx:(Math.random()-.5)*.0002,vy:-(Math.random()*.001+.0003),vz:(Math.random()-.5)*.0002,
+    size:Math.random()*3+1,alpha:Math.random()*.5+.1,
+    color:`hsl(${30+Math.random()*20},${50+Math.random()*30}%,${50+Math.random()*30}%)`,
+  });
+}
+
+function drawParticles(){
+  ctx.clearRect(0,0,W,H);
+  particles.forEach(p=>{
+    p.x+=p.vx;p.y+=p.vy;p.z+=p.vz;
+    if(p.y<-.1){p.y=1.1;p.x=Math.random()*1.5;p.z=Math.random();}
+    if(p.x<-.2)p.x=1.2;if(p.x>1.2)p.x=-.2;
+    const perspective=1/(1+p.z*.5);
+    const sx=(p.x-.5)*perspective*W+W/2;
+    const sy=p.y*H;
+    const sr=p.size*perspective;
+    ctx.beginPath();
+    ctx.arc(sx,sy,sr,0,Math.PI*2);
+    ctx.fillStyle=p.color;
+    ctx.globalAlpha=p.alpha*perspective;
+    ctx.fill();
+  });
+  ctx.globalAlpha=1;
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
+
+// ══════════════════════════════════════
+// SCROLL REVEAL
+// ══════════════════════════════════════
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});
+},{threshold:.1});
+document.querySelectorAll('.reveal,.reveal-left,.reveal-right').forEach(el=>observer.observe(el));
+
+// ══════════════════════════════════════
+// MENU TABS
+// ══════════════════════════════════════
+function switchTab(name,btn){
+  document.querySelectorAll('[id^="tab-"]').forEach(t=>{
+    t.className='menu-section-hidden';
+  });
+  document.getElementById('tab-'+name).className='menu-section-visible';
+  document.querySelectorAll('.menu-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ══════════════════════════════════════
+// 3D CARD TILT
+// ══════════════════════════════════════
+document.querySelectorAll('.tilt-card').forEach(card=>{
+  card.addEventListener('mousemove',e=>{
+    const r=card.getBoundingClientRect();
+    const x=e.clientX-r.left-r.width/2;
+    const y=e.clientY-r.top-r.height/2;
+    card.style.transform=`perspective(600px) rotateX(${-y/15}deg) rotateY(${x/15}deg) translateZ(8px)`;
+  });
+  card.addEventListener('mouseleave',()=>{card.style.transform='';});
+});
+
+// ══════════════════════════════════════
+// MAP ZONES
+// ══════════════════════════════════════
+const zoneData={
+  coffee:{name:'☕ Coffee Bar',desc:'Where every morning starts and every night finds its second wind. Best for coffee dates and solo sits.',dishes:['Schezwan Chicken','Chicken Butter Garlic'],crowd:'Moderate'},
+  mural:{name:'🎨 Mural Wall',desc:'Our iconic selfie hotspot. The hand-painted mural is a canvas for your best shots.',dishes:['Any item — great backdrop!'],crowd:'Popular for photos'},
+  dining:{name:'🍝 Main Dining',desc:'The heart of Café Latté. Big tables, big orders, big conversations.',dishes:['Mix Platter','Chicken Stroganoff','Drums of Heaven'],crowd:'Usually busy'},
+  chill:{name:'🌿 Chill Corner',desc:'Tucked away, low lighting, soft seats. Bring a book or just stare into space.',dishes:['Honey Crispy Potato','Veg Gravy Noodles'],crowd:'Usually quiet'},
+  bar:{name:'🍹 Bar Counter',desc:'Watch the magic happen. The bar is where the chefs work their Indo-Chinese sorcery.',dishes:['Prawn Butter Garlic','Lemon Fish'],crowd:'Lively in evenings'},
+};
+const popup=document.getElementById('zone-popup');
+function showZonePopup(e,key){
+  const z=zoneData[key];
+  popup.innerHTML=`<strong style="color:var(--latte)">${z.name}</strong><br><span style="color:rgba(245,236,215,.5);font-size:.72rem;">Crowd: ${z.crowd}</span>`;
+  popup.style.left=(e.target.offsetLeft+e.target.offsetWidth/2)+'px';
+  popup.style.top=(e.target.offsetTop-60)+'px';
+  popup.className='zone-popup visible';
+}
+function hidePopup(){popup.className='zone-popup';}
+function showZone(key){
+  const z=zoneData[key];
+  document.getElementById('zone-modal-content').innerHTML=`
+    <h3 style="font-family:'Playfair Display',serif;font-size:1.8rem;margin-bottom:.8rem;">${z.name}</h3>
+    <p style="color:rgba(245,236,215,.6);line-height:1.7;margin-bottom:1.2rem;">${z.desc}</p>
+    <div style="margin-bottom:1rem;"><span style="font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--latte);">Crowd Level</span><br><span style="font-weight:600;">${z.crowd}</span></div>
+    <div><span style="font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--latte);">Best Dishes Here</span><br>${z.dishes.map(d=>`<span style="display:inline-block;margin:.3rem .3rem 0 0;background:rgba(200,149,94,.12);border:1px solid rgba(200,149,94,.2);padding:.25rem .7rem;border-radius:20px;font-size:.8rem;">${d}</span>`).join('')}</div>
+  `;
+  document.getElementById('zone-overlay').style.display='block';
+  document.getElementById('zone-modal-wrapper').style.display='block';
+}
+function closeZoneModal(){
+  document.getElementById('zone-overlay').style.display='none';
+  document.getElementById('zone-modal-wrapper').style.display='none';
+}
+
+// ══════════════════════════════════════
+// RESERVE
+// ══════════════════════════════════════
+function scrollToSection(id){document.getElementById(id).scrollIntoView({behavior:'smooth'});}
+function selectTime(el){
+  document.querySelectorAll('.time-slot').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+function confirmReservation(){
+  const name=document.querySelector('.form-input[placeholder]').value;
+  if(!name){alert('Please enter your name!');return;}
+  alert(`🎉 Table reserved for ${name}!\n\nWe'll see you tonight at Café Latté.\nBehala Chowrasta, Kolkata. Open till 1 AM 🌙`);
+}
+
+// ══════════════════════════════════════
+// MUSIC
+// ══════════════════════════════════════
+let playing=false;
+const audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+let musicInterval;
+function createNote(freq,start,dur){
+  const osc=audioCtx.createOscillator();
+  const gain=audioCtx.createGain();
+  osc.connect(gain);gain.connect(audioCtx.destination);
+  osc.frequency.value=freq;osc.type='sine';
+  gain.gain.setValueAtTime(0,start);
+  gain.gain.linearRampToValueAtTime(.06,start+.05);
+  gain.gain.linearRampToValueAtTime(0,start+dur);
+  osc.start(start);osc.stop(start+dur+.1);
+}
+const lofiNotes=[220,247,261,293,329,349,392,440];
+function playLofi(){
+  const now=audioCtx.currentTime;
+  for(let i=0;i<4;i++){
+    const n=lofiNotes[Math.floor(Math.random()*lofiNotes.length)];
+    createNote(n,now+i*.4,0.3);
+  }
+}
+function toggleMusic(){
+  playing=!playing;
+  document.getElementById('musicBtn').textContent=playing?'🔇':'🎵';
+  if(playing){
+    if(audioCtx.state==='suspended')audioCtx.resume();
+    playLofi();musicInterval=setInterval(playLofi,1600);
+  }else{
+    clearInterval(musicInterval);
+  }
+}
+
+// ══════════════════════════════════════
+// THEME
+// ══════════════════════════════════════
+let dark=true;
+function toggleTheme(){
+  dark=!dark;
+  document.body.classList.toggle('light',!dark);
+  document.querySelector('.theme-btn').textContent=dark?'🌙':'☀️';
+}
+
+// ══════════════════════════════════════
+// LIVE CROWD METER ANIMATION
+// ══════════════════════════════════════
+setTimeout(()=>{
+  const fill=document.getElementById('crowd-fill');
+  if(fill){const r=35+Math.random()*30;fill.style.width=r+'%';}
+},2000);
+</script>
+</body>
+</html>
